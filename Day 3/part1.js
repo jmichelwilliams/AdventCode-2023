@@ -3,19 +3,27 @@ const { data } = require('./data.js');
 const rows = data.split('\n').map((x) => x.replace(/[^\d.]/g, '*'));
 
 const calculateSum = (arr) => {
-  const isValidSymbol = (x, y) => arr[x] && arr[x][y] === '*';
-
   let sum = 0;
 
-  arr.forEach((row, rowIndex) => {
-    const matches = row.match(/\d+/g) || [];
-    matches.forEach((match) => {
-      let isAdded = false;
-      const matchIndex = row.indexOf(match);
+  for (let i = 0; i < arr.length; i++) {
+    const matches = arr[i].matchAll(/\d+/g) || [];
 
-      for (let i = rowIndex - 1; i <= rowIndex + 1; i++) {
-        for (let j = matchIndex - 1; j <= matchIndex + match.length; j++) {
-          if (isValidSymbol(i, j)) {
+    for (const match of matches) {
+      const [number, index] = [match[0], match.index];
+
+      let isAdded = false;
+
+      for (
+        let j = Math.max(0, i - 1);
+        j <= Math.min(arr.length - 1, i + 1);
+        j++
+      ) {
+        for (
+          let k = Math.max(0, index - 1);
+          k <= Math.min(arr[i].length - 1, index + number.length);
+          k++
+        ) {
+          if (arr[j][k] === '*') {
             isAdded = true;
             break;
           }
@@ -24,10 +32,10 @@ const calculateSum = (arr) => {
       }
 
       if (isAdded) {
-        sum += parseInt(match);
+        sum += Number(number);
       }
-    });
-  });
+    }
+  }
 
   return sum;
 };
